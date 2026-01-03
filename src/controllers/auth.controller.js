@@ -1,5 +1,6 @@
 const authService = require('../services/auth.service')
-const { signupSchema } = require('../schemas/auth.schema')
+const { signupSchema, loginSchema } = require('../schemas/auth.schema');
+const { success } = require('zod');
 
 async function signup(req, res) {
 
@@ -32,6 +33,24 @@ async function signup(req, res) {
 
 }
 
+
+async function login(req, res) {
+
+    const result = loginSchema.safeParse(req.body)
+
+    if (!result.success) {
+        return res.status(400).json({
+            success: false,
+            errors: result.error.flatten().fieldErrors
+        })
+    }
+
+    const validatedData = result.data
+
+
+}
+
 module.exports = {
-    signup
+    signup,
+    login
 }

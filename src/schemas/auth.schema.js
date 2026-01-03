@@ -13,7 +13,7 @@ const signupSchema = z.object({
 
     email: z
         .email('Invalid email formart')
-        .endsWith('@umn.edu', 'Email must end with@umn.edu'),
+        .endsWith('@umn.edu', 'Email must end with @umn.edu'),
 
     password: z
         .string()
@@ -21,7 +21,17 @@ const signupSchema = z.object({
         .max(128, 'password is too long')
 })
 
+const loginSchema = z.object({
+    email: z
+        .email('Invalid email formart')
+        .endsWith('@umn.edu', 'Email must end with @umn.edu'),
+
+    password: z
+        .string()
+        .min(1, 'Password is required')
+})
 
 module.exports = {
     signupSchema,
+    loginSchema
 }
