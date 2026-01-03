@@ -1,5 +1,6 @@
 const authService = require('../services/auth.service')
-const { signupSchema } = require('../schemas/auth.schema')
+const { signupSchema, loginSchema } = require('../schemas/auth.schema');
+const { success } = require('zod');
 
 async function signup(req, res) {
 
@@ -32,6 +33,47 @@ async function signup(req, res) {
 
 }
 
+
+async function login(req, res) {
+
+    const result = loginSchema.safeParse(req.body)
+
+    if (!result.success) {
+        return res.status(400).json({
+            success: false,
+            errors: result.error.flatten().fieldErrors
+        })
+    }
+
+    const validatedData = result.data
+
+    try {
+        const result = await authService.login(validatedData)
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful",
+            ...result
+        })
+
+    } catch (error) {
+        if (error.message === 'INVALID_CREDENTIALS') {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            })
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+
+    }
+
+}
+
 module.exports = {
-    signup
+    signup,
+    login
 }
