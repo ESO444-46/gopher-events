@@ -4,3 +4,5 @@ node_modules/
 /generated/prisma
 package-lock.json
 _notes/
+sample.js
+prisma/seed.js
