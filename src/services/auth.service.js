@@ -31,8 +31,28 @@ async function signup(userData) {
 
 
 
+async function login(userData) {
+    const { email, password } = userData
+
+    const user = await userRepo.findByEmail(email)
+
+    if (!user) {
+        throw new Error('INVALID_CREDENTIALS')
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+        throw new Error('INVALID_CREDENTIALS')
+    }
+
+    return user
+}
+
+
 
 module.exports = {
     signup,
+    login
 }
 

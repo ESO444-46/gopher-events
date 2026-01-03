@@ -47,6 +47,34 @@ async function login(req, res) {
 
     const validatedData = result.data
 
+    try {
+        const user = await authService.login(validatedData)
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful",
+            user: {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email
+            }
+        })
+
+    } catch (error) {
+        if (error.message === 'INVALID_CREDENTIALS') {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            })
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+
+    }
 
 }
 
