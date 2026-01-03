@@ -48,17 +48,12 @@ async function login(req, res) {
     const validatedData = result.data
 
     try {
-        const user = await authService.login(validatedData)
+        const result = await authService.login(validatedData)
 
         return res.status(200).json({
             success: true,
             message: "Login successful",
-            user: {
-                id: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email
-            }
+            ...result
         })
 
     } catch (error) {

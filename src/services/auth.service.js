@@ -1,6 +1,7 @@
 const userRepo = require('../repositories/user.repo');
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+const utils = require('../utils/auth.utils')
 
 async function signup(userData) {
     const { firstName, lastName, email, password } = userData
@@ -46,7 +47,20 @@ async function login(userData) {
         throw new Error('INVALID_CREDENTIALS')
     }
 
-    return user
+    const accessToken = utils.generateAccessToken({
+        userId: user.id,
+        email: user.email
+    })
+
+    return {
+        user: {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+        },
+        accessToken
+    }
 }
 
 
