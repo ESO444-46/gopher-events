@@ -1,7 +1,7 @@
 const z = require('zod')
 const GRACE_MS = 30 * 1000 // 1Minute
 
-const createEventSchema = z.object({
+const createEvent = z.object({
     title: z
         .string()
         .trim()
@@ -41,5 +41,5 @@ const createEventSchema = z.object({
     })
 
 module.exports = {
-    createEventSchema
+    createEvent
 }

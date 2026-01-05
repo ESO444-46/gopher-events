@@ -1,8 +1,8 @@
-const { success } = require('zod')
-const { createEventSchema } = require('../schemas/event.schema')
+const eventSchema = require('../schemas/event.schema')
+const eventService = require('../services/event.service')
 
-function createEvent(req, res) {
-    const result = createEventSchema.safeParse(req.body)
+async function createEvent(req, res) {
+    const result = eventSchema.createEvent.safeParse(req.body)
 
     if (!result.success) {
         return res.status(400).json({
@@ -10,8 +10,24 @@ function createEvent(req, res) {
             errors: result.error.flatten().fieldErrors
         })
     }
-    const validatedData = result.data
 
+    const validatedData = {
+        ...result.data,
+        creatorId: req.user.userId
+    }
+
+    try {
+        const event = await eventService.createEvent(validatedData)
+
+        return res.json({
+            event
+        })
+    } catch (err) {
+        return res.status.json({
+            success: false,
+            message: 'Error'
+        })
+    }
 }
 
 module.exports = { createEvent }
