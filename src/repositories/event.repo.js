@@ -2,7 +2,7 @@ const prisma = require('../prisma/client')
 
 
 async function createEvent(eventData) {
-    return await prisma.event.create({
+    return prisma.event.create({
         data: {
             title: eventData.title,
             description: eventData.description,
@@ -24,6 +24,31 @@ async function createEvent(eventData) {
     })
 }
 
+
+async function getEvents() {
+    return prisma.event.findMany({
+        where: {
+            startsAt: {
+                gte: new Date()
+            }
+        },
+        orderBy: {
+            startsAt: 'asc'
+        },
+        select: {
+            publicId: true,
+            title: true,
+            venue: true,
+            startsAt: true,
+            creator: {
+                select: {
+                    firstName: true,
+                }
+            }
+        }
+    })
+}
+
 module.exports = {
-    createEvent,
+    createEvent, getEvents
 };

@@ -32,4 +32,21 @@ async function createEvent(req, res) {
     }
 }
 
-module.exports = { createEvent }
+
+async function getEvents(req, res) {
+    try {
+        const events = await eventService.getEvents()
+
+        return res.status(200).json({
+            success: true,
+            data: events
+        })
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch events'
+        })
+    }
+}
+
+module.exports = { createEvent, getEvents }
