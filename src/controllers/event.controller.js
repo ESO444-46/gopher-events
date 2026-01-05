@@ -1,3 +1,4 @@
+const { success } = require('zod')
 const eventSchema = require('../schemas/event.schema')
 const eventService = require('../services/event.service')
 
@@ -19,13 +20,14 @@ async function createEvent(req, res) {
     try {
         const event = await eventService.createEvent(validatedData)
 
-        return res.json({
+        return res.status(201).json({
+            success: true,
             event
         })
     } catch (err) {
-        return res.status.json({
+        return res.status(500).json({
             success: false,
-            message: 'Error'
+            message: 'Error in creating event'
         })
     }
 }

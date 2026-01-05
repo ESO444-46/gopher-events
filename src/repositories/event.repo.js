@@ -11,11 +11,13 @@ async function createEvent(eventData) {
             endsAt: eventData.endsAt ? new Date(eventData.endsAt) : undefined,
             creatorId: eventData.creatorId
         }
-        , include: {
+        , select: {
+            publicId: true,
+            title: true,
             creator: {
                 select: {
                     firstName: true,
-                    lastName: true,
+                    lastName: true
                 }
             }
         }
