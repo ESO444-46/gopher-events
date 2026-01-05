@@ -1,7 +1,11 @@
 const eventRepo = require('../repositories/event.repo')
 
 async function createEvent(eventData) {
-    return await eventRepo.createEvent(eventData)
+    return eventRepo.createEvent(eventData)
 };
 
-module.exports = { createEvent }
+async function getEvents() {
+    return eventRepo.getEvents()
+}
+
+module.exports = { createEvent, getEvents }
