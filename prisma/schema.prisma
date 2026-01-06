@@ -15,54 +15,55 @@ datasource db {
 }
 
 
-model User{
-  id Int @id @default(autoincrement())
+model User {
+  id        Int      @id @default(autoincrement())
 
   firstName String
-  lastName String
-  email String @unique
-  password String
+  lastName  String
+  email     String   @unique
+  password  String
 
   createdAt DateTime @default(now())
 
-  // Ownership(one to many)
+  // Ownership (one-to-many)
   createdEvents Event[]
 
   // Attendance (many-to-many)
   eventLinks UserEvent[]
 }
 
-model Event{
-  id Int @id @default(autoincrement())
-  publicId String @default(uuid())
+model Event {
+  id       Int    @id @default(autoincrement())
+  publicId String @unique @default(uuid())
 
-  title String
-  description  String
-  venue String
+  title       String
+  description String
+  venue       String
 
-  //Event timing
+  // Event timing
   startsAt DateTime
-  endsAt DateTime?
-  
-  //Metadata
+  endsAt   DateTime?
+
+  // Metadata
   createdAt DateTime @default(now())
 
   // Ownership
   creatorId Int
-  creator User @relation(fields:[creatorId],references:[id])
+  creator   User @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
-  //Attendance
-  userlinks UserEvent[]
+  // Attendance
+  userLinks UserEvent[]
+
+  @@index([creatorId])
 }
 
-model UserEvent{
-  userId Int
+model UserEvent {
+  userId  Int
   eventId Int
 
-  user User @relation(fields:[userId],references:[id])
-  event Event @relation(fields:[eventId],references:[id])
-  
-  @@id([userId,eventId])
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([userId, eventId])
+  @@index([eventId])
 }
-
-

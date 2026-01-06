@@ -49,6 +49,37 @@ async function getEvents() {
     })
 }
 
+async function findEventByPublicId(publicId) {
+    return prisma.event.findUnique({
+        where: {
+            publicId: publicId
+        },
+        select: {
+            publicId: true,
+            title: true,
+            description: true,
+            venue: true,
+            startsAt: true,
+            endsAt: true,
+            createdAt: true,
+            creator: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true
+                }
+            }
+        }
+    })
+}
+async function findByPublicId(publicId) {
+    return prisma.event.findUnique({
+        where: { publicId }
+    })
+}
+
+
+
 module.exports = {
-    createEvent, getEvents
+    createEvent, getEvents, findEventByPublicId, findByPublicId
 };
