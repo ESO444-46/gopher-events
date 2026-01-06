@@ -49,4 +49,38 @@ async function getEvents(req, res) {
     }
 }
 
-module.exports = { createEvent, getEvents }
+const getEventByPublicId = async function (req, res) {
+    const result = eventSchema.EventParamSchema.safeParse(req.params)
+
+    if (!result.success) {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid Event Id'
+        })
+    }
+
+    try {
+        const event = await eventService.getEventByPublicId(result.data.publicId)
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                message: "Event not found"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: event
+        })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
+module.exports = { createEvent, getEvents, getEventByPublicId }

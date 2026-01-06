@@ -8,4 +8,8 @@ async function getEvents() {
     return eventRepo.getEvents()
 }
 
-module.exports = { createEvent, getEvents }
+async function getEventByPublicId(publicId) {
+    return eventRepo.findEventByPublicId(publicId)
+}
+
+module.exports = { createEvent, getEvents, getEventByPublicId }
