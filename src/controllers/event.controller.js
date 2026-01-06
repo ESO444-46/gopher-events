@@ -83,4 +83,49 @@ const getEventByPublicId = async function (req, res) {
     }
 }
 
-module.exports = { createEvent, getEvents, getEventByPublicId }
+async function registerUserForEvent(req, res) {
+    const result = eventSchema.EventParamSchema.safeParse(req.params)
+
+    if (!result.success) {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid Event Id'
+        })
+    }
+
+    try {
+        await eventService.registerUserForEvent({
+            userId: req.user.userId,
+            publicId: result.data.publicId
+        })
+
+        return res.status(201).json({
+            success: true,
+            message: 'Registered for event'
+        })
+    } catch (error) {
+        if (error.code === 'EVENT_NOT_FOUND') {
+            return res.status(404).json({
+                success: false,
+                message: error.message
+            })
+        }
+
+        if (error.code === 'ALREADY_REGISTERED') {
+            return res.status(409).json({
+                success: false,
+                message: error.message
+            })
+        }
+
+        // unexpected error
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+}
+
+
+
+module.exports = { createEvent, getEvents, getEventByPublicId, registerUserForEvent }

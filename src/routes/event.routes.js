@@ -10,5 +10,7 @@ router.get('/', eventController.getEvents)
 
 router.post('/', authMiddleware, eventController.createEvent)
 
+router.post('/:publicId/register', authMiddleware, eventController.registerUserForEvent)
+
 
 module.exports = router
