@@ -8,6 +8,8 @@ router.get('/', eventController.getEvents)
 
 router.get('/:publicId', eventController.getEventByPublicId)
 
+router.get('/me/created', authMiddleware, eventController.getMyCreatedEvents)
+
 router.get('/me/registered', authMiddleware, eventController.getMyRegisteredEvents)
 
 router.post('/', authMiddleware, eventController.createEvent)

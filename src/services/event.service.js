@@ -44,4 +44,8 @@ async function registerUserForEvent({ userId, publicId }) {
 
 }
 
-module.exports = { createEvent, getEvents, getEventByPublicId, registerUserForEvent }
+async function getMyCreatedEvents(userId) {
+    return eventRepo.findEventsByCreatorId(userId)
+}
+
+module.exports = { createEvent, getEvents, getEventByPublicId, registerUserForEvent, getMyCreatedEvents }

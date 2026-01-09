@@ -78,8 +78,31 @@ async function findByPublicId(publicId) {
     })
 }
 
+async function findEventsByCreatorId(creatorId) {
+    return prisma.event.findMany({
+        where: {
+            creatorId
+        },
+        select: {
+            publicId: true,
+            title: true,
+            venue: true,
+            startsAt: true,
+            creator: {
+                select: {
+                    firstName: true
+                }
+            }
+        }
+    })
+}
+
 
 
 module.exports = {
-    createEvent, getEvents, findEventByPublicId, findByPublicId
+    createEvent,
+    getEvents,
+    findEventByPublicId,
+    findByPublicId,
+    findEventsByCreatorId
 };
