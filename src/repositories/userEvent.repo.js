@@ -20,7 +20,32 @@ async function createRegistration(userId, eventId) {
 
 }
 
+async function findUserEventsByUserId(userId) {
+    return prisma.userEvent.findMany({
+        where: {
+            userId
+        },
+        select: {
+            event: {
+                select: {
+                    publicId: true,
+                    title: true,
+                    venue: true,
+                    startsAt: true,
+                    creator: {
+                        select: {
+                            firstName: true
+                        }
+                    }
+                }
+            }
+        }
+    })
+
+}
+
 module.exports = {
     exists,
-    createRegistration
+    createRegistration,
+    findUserEventsByUserId
 }
