@@ -48,4 +48,25 @@ async function getMyCreatedEvents(userId) {
     return eventRepo.findEventsByCreatorId(userId)
 }
 
-module.exports = { createEvent, getEvents, getEventByPublicId, registerUserForEvent, getMyCreatedEvents }
+async function getEventAttendees(publicId, userId) {
+    const event = await eventRepo.findByPublicIdAndCreatorId(publicId, userId)
+
+    if (!event) {
+        // TODO: replace with HttpError during error-handling refactor
+        const err = new Error('Event not found')
+        err.code = 'EVENT_NOT_FOUND'
+        throw err
+    }
+
+    const rows = await userEventRepo.findAttendeesByEventId(event.id)
+    return rows.map(r => r.user)
+}
+
+module.exports = {
+    createEvent,
+    getEvents,
+    getEventByPublicId,
+    registerUserForEvent,
+    getMyCreatedEvents,
+    getEventAttendees
+}
