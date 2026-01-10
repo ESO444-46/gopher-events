@@ -147,4 +147,20 @@ async function getMyRegisteredEvents(req, res) {
 
 }
 
-module.exports = { createEvent, getEvents, getEventByPublicId, registerUserForEvent, getMyRegisteredEvents }
+
+async function getMyCreatedEvents(req, res) {
+    const { userId } = req.user
+
+    try {
+        const events = await eventService.getMyCreatedEvents(userId)
+        return res.status(200).json(events)
+    }
+    catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+}
+
+module.exports = { createEvent, getEvents, getEventByPublicId, registerUserForEvent, getMyRegisteredEvents, getMyCreatedEvents }
