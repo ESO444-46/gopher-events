@@ -97,6 +97,14 @@ async function findEventsByCreatorId(creatorId) {
     })
 }
 
+async function findByPublicIdAndCreatorId(publicId, creatorId) {
+    return prisma.event.findFirst({
+        where: {
+            publicId,
+            creatorId
+        }
+    })
+}
 
 
 module.exports = {
@@ -104,5 +112,6 @@ module.exports = {
     getEvents,
     findEventByPublicId,
     findByPublicId,
-    findEventsByCreatorId
+    findEventsByCreatorId,
+    findByPublicIdAndCreatorId
 };

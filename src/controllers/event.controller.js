@@ -163,4 +163,50 @@ async function getMyCreatedEvents(req, res) {
     }
 }
 
-module.exports = { createEvent, getEvents, getEventByPublicId, registerUserForEvent, getMyRegisteredEvents, getMyCreatedEvents }
+async function getEventAttendees(req, res) {
+    const { userId } = req.user
+    const { publicId } = req.params
+
+    const result = eventSchema.EventPublicIdParamSchema.safeParse({
+        publicId
+    })
+
+    if (!result.success) {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid event Id'
+        })
+    }
+    try {
+        const attendees = await eventService.getEventAttendees(result.data.publicId, userId)
+        return res.status(200).json({
+            success: true,
+            attendees
+
+        })
+
+    } catch (err) {
+        if (err.code === 'EVENT_NOT_FOUND') {
+            return res.status(404).json({
+                success: false,
+                message: err.message
+            })
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+
+    }
+}
+
+module.exports = {
+    createEvent,
+    getEvents,
+    getEventByPublicId,
+    registerUserForEvent,
+    getMyRegisteredEvents,
+    getMyCreatedEvents,
+    getEventAttendees
+}

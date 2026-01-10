@@ -12,6 +12,8 @@ router.get('/me/created', authMiddleware, eventController.getMyCreatedEvents)
 
 router.get('/me/registered', authMiddleware, eventController.getMyRegisteredEvents)
 
+router.get('/:publicId/attendees', authMiddleware, eventController.getEventAttendees)
+
 router.post('/', authMiddleware, eventController.createEvent)
 
 router.post('/:publicId/register', authMiddleware, eventController.registerUserForEvent)

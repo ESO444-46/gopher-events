@@ -44,8 +44,26 @@ async function findUserEventsByUserId(userId) {
 
 }
 
+async function findAttendeesByEventId(eventId) {
+    return prisma.userEvent.findMany({
+        where: {
+            eventId
+        },
+        select: {
+            user: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true
+                }
+            }
+        }
+    })
+}
+
 module.exports = {
     exists,
     createRegistration,
-    findUserEventsByUserId
+    findUserEventsByUserId,
+    findAttendeesByEventId
 }
