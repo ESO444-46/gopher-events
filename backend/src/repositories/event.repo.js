@@ -1,0 +1,123 @@
+const prisma = require('../prisma/client')
+
+
+async function createEvent(eventData) {
+    return prisma.event.create({
+        data: {
+            title: eventData.title,
+            description: eventData.description,
+            venue: eventData.venue,
+            startsAt: new Date(eventData.startsAt),
+            endsAt: eventData.endsAt ? new Date(eventData.endsAt) : undefined,
+            creatorId: eventData.creatorId
+        }
+        , select: {
+            publicId: true,
+            title: true,
+            creator: {
+                select: {
+                    firstName: true,
+                    lastName: true
+                }
+            }
+        }
+    })
+}
+
+/*
+Please change the lse to gte or else you will only see past events not current events
+
+*/
+async function getEvents(searchString) {
+    return prisma.event.findMany({
+        where: {
+            startsAt: {
+                gte: new Date()
+            },
+            title: {
+                contains: searchString,
+                mode: 'insensitive'
+            }
+
+        },
+        orderBy: {
+            startsAt: 'asc'
+        },
+        select: {
+            publicId: true,
+            title: true,
+            venue: true,
+            startsAt: true,
+            endsAt: true,
+
+        }
+    })
+}
+
+async function findEventByPublicId(publicId) {
+    return prisma.event.findUnique({
+        where: {
+            publicId: publicId
+        },
+        select: {
+            id: true,
+            publicId: true,
+            title: true,
+            description: true,
+            venue: true,
+            startsAt: true,
+            endsAt: true,
+            createdAt: true,
+            creator: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true
+                }
+            }
+        }
+    })
+}
+async function findByPublicId(publicId) {
+    return prisma.event.findUnique({
+        where: { publicId }
+    })
+}
+
+async function findEventsByCreatorId(creatorId) {
+    return prisma.event.findMany({
+        where: {
+            creatorId
+        },
+        select: {
+            publicId: true,
+            title: true,
+            venue: true,
+            startsAt: true,
+            creator: {
+                select: {
+                    firstName: true
+                }
+            }
+        }
+    })
+}
+
+async function findByPublicIdAndCreatorId(publicId, creatorId) {
+    return prisma.event.findFirst({
+        where: {
+            publicId,
+            creatorId
+        }
+    })
+}
+
+
+module.exports = {
+    createEvent,
+    getEvents,
+    findEventByPublicId,
+    findByPublicId,
+    findEventsByCreatorId,
+    findByPublicIdAndCreatorId
+};

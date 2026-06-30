@@ -1,0 +1,196 @@
+import { useState } from "react";
+import TopNav from "../components/createEvent/TopNav";
+import Toast from "../components/ToastNotification";
+import Spinner from "../components/SpinnerComponent";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+const CreateEvent = () => {
+    const [title, setTitle] = useState('')
+    const [description,setDescription] = useState("")
+    const [venue, setVenue] = useState("")
+    const [startsAt, setStartsAt] = useState("")
+    const [endsAt, setEndsAt] = useState("")
+    const [isLoading, setLoading] = useState(false)
+    const navigate = useNavigate()
+
+
+    async function handleSubmission (e){
+        e.preventDefault();
+        setLoading(true)
+
+
+        localStorage.setItem("token","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIxLCJlbWFpbCI6InZhamluMDAxQHVtbi5lZHUiLCJpYXQiOjE3ODIzOTgzMDksImV4cCI6MTc4MjM5OTIwOX0.K_zcwOW1tB7pCMObVEJic_dm-9dD_Dd_q4hZFI10_NU")
+        const token = localStorage.getItem("token");
+        console.log(startsAt,endsAt)
+        try {
+            const result = await axios.post(
+                `http://localhost:3000/events`,
+                {
+                    title,
+                    description,
+                    venue,
+                    startsAt: new Date(startsAt).toISOString(),
+                    endsAt: new Date(endsAt).toISOString(),
+                },
+                {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                }
+            );
+            const {publicId} = result.data.event
+            navigate(`/events/${publicId}`)
+          
+
+            }catch(error){
+              console.log(error.response)
+            }finally{
+                setLoading(false)
+            }
+        }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      
+      {/* Top Nav */}
+        <TopNav/>
+
+      {/* Main Form */}
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+        
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">Create Event</h1>
+          <p className="mt-1 text-gray-500 text-sm">Fill in the details for your campus event</p>
+        </div>
+
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+          <form onSubmit = {handleSubmission}className="space-y-6">
+            
+            {/* Title */}
+            <div>
+              <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Event Title
+              </label>
+              <input
+                id="title"
+                name="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                type="text"
+                required
+                placeholder="e.g., UMN Hackathon 2026"
+                className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7a0019] focus:border-[#7a0019] transition-colors sm:text-sm"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                rows={5}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+                placeholder="Tell people what your event is about..."
+                className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7a0019] focus:border-[#7a0019] transition-colors sm:text-sm resize-y"
+              />
+            </div>
+
+            {/* Venue */}
+            <div>
+              <label htmlFor="venue" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Venue
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <input
+                  id="venue"
+                  name="venue"
+                  value={venue}
+                  type="text"
+                  onChange={(e) => setVenue(e.target.value)}
+                  required
+                  placeholder="e.g., Coffman Memorial Union"
+                  className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7a0019] focus:border-[#7a0019] transition-colors sm:text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Date & Time Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              
+              {/* Starts At */}
+              <div>
+                <label htmlFor="startsAt" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Starts At <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="startsAt"
+                  name="startsAt"
+                  value={startsAt}
+                  onChange={(e) => setStartsAt(e.target.value)}
+                  required
+                  type="datetime-local"
+                  onClick={(e) => e.target.showPicker?.()}
+                  className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7a0019] focus:border-[#7a0019] transition-colors sm:text-sm"
+                />
+              </div>
+
+              {/* Ends At */}
+              <div>
+                <label htmlFor="endsAt" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Ends At <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="endsAt"
+                  name="endsAt"
+                  value={endsAt}
+                  onChange={(e) => setEndsAt(e.target.value)}
+                  type="datetime-local"
+                  onClick={(e) => e.target.showPicker?.()}
+                  required
+                  className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7a0019] focus:border-[#7a0019] transition-colors sm:text-sm"
+                />
+              </div>
+
+            </div>
+
+            {/* Submit */}
+            <div className="pt-4">
+              <button
+                disabled = {isLoading}
+                type="submit"
+                className="w-full flex iterms-center justify-center py-3 px-4 rounded-xl text-sm font-bold text-white bg-[#7a0019] hover:bg-[#5a0012] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#7a0019] transition-colors shadow-sm"
+              >
+            {isLoading ? (
+                <div className=" flex items-center justify-center gap-2">
+                    <Spinner />
+                    Creating...
+                </div>
+            ) : (                  
+                ("Create Event")
+            )}
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </main>
+    </div>
+  );
+};
+
+export default CreateEvent;
