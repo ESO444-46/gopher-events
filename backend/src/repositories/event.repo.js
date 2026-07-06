@@ -7,6 +7,8 @@ async function createEvent(eventData) {
             title: eventData.title,
             description: eventData.description,
             venue: eventData.venue,
+            thumbnailUrl: eventData.thumbnailUrl,
+            bannerUrl: eventData.bannerUrl,
             startsAt: new Date(eventData.startsAt),
             endsAt: eventData.endsAt ? new Date(eventData.endsAt) : undefined,
             creatorId: eventData.creatorId
@@ -14,12 +16,49 @@ async function createEvent(eventData) {
         , select: {
             publicId: true,
             title: true,
+            thumbnailUrl: true,
+            bannerUrl: true,
             creator: {
                 select: {
                     firstName: true,
                     lastName: true
                 }
             }
+        }
+    })
+}
+
+async function updateEvent(eventData) {
+    const event = await findByPublicIdAndCreatorId(eventData.publicId, eventData.creatorId)
+
+    if (!event) {
+        const err = new Error('Event not found')
+        err.code = 'EVENT_NOT_FOUND'
+        throw err
+    }
+
+    return prisma.event.update({
+        where: {
+            id: event.id
+        },
+        data: {
+            title: eventData.title,
+            description: eventData.description,
+            venue: eventData.venue,
+            thumbnailUrl: eventData.thumbnailUrl,
+            bannerUrl: eventData.bannerUrl,
+            startsAt: new Date(eventData.startsAt),
+            endsAt: eventData.endsAt ? new Date(eventData.endsAt) : null
+        },
+        select: {
+            publicId: true,
+            title: true,
+            description: true,
+            venue: true,
+            thumbnailUrl: true,
+            bannerUrl: true,
+            startsAt: true,
+            endsAt: true
         }
     })
 }
@@ -47,6 +86,7 @@ async function getEvents(searchString) {
             publicId: true,
             title: true,
             venue: true,
+            thumbnailUrl: true,
             startsAt: true,
             endsAt: true,
 
@@ -65,6 +105,8 @@ async function findEventByPublicId(publicId) {
             title: true,
             description: true,
             venue: true,
+            thumbnailUrl: true,
+            bannerUrl: true,
             startsAt: true,
             endsAt: true,
             createdAt: true,
@@ -93,6 +135,7 @@ async function findEventsByCreatorId(creatorId) {
             publicId: true,
             title: true,
             venue: true,
+            thumbnailUrl: true,
             startsAt: true,
             creator: {
                 select: {
@@ -115,6 +158,7 @@ async function findByPublicIdAndCreatorId(publicId, creatorId) {
 
 module.exports = {
     createEvent,
+    updateEvent,
     getEvents,
     findEventByPublicId,
     findByPublicId,

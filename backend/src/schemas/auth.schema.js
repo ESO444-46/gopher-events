@@ -31,7 +31,18 @@ const loginSchema = z.object({
         .min(1, 'Password is required')
 })
 
+const otpSchema = z.object({
+    email: z
+        .email('Invalid email formart')
+        .endsWith('@umn.edu', 'Email must end with @umn.edu'),
+
+    otpCode: z.string("OTP code is required")
+        .length(6, "OTP must be exactly 6 digits")
+        .regex(/^[0-9]+$/, "OTP must only contain numbers")
+})
+
 module.exports = {
     signupSchema,
-    loginSchema
+    loginSchema,
+    otpSchema
 }

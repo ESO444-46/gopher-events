@@ -1,51 +1,40 @@
 import { useState } from "react";
 import Spinner from "./SpinnerComponent";
-import axios from "axios";
+import api from "../api/axios";
 import GopherMessage from "./GopherMessage";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../context/ToastContext";
 
 const SignUpComponenet = ({
-    firstName, setFirstName,
-    lastName, setLastName,
-    email, setEmail,
-    password, setPassword
+  firstName, setFirstName,
+  lastName, setLastName,
+  email, setEmail,
+  password, setPassword
 
 }) =>{
+    const navigate = useNavigate()
+    const { showToast } = useToast()
     const [isLoading, setLoading] = useState(false)
-    const [message, setMessage] = useState({
-      type:"info",
-      text:"Only @umn.edu emails are allowed for now!"
-    })
 
     const onSignupSubmit = async (event) =>{
         event.preventDefault();
         setLoading(true)
-        // setLoading(true)
 
         try{
-            console.log(firstName,lastName,email,password)
-            const result = await axios.post("http://localhost:3000/auth/signup",{
+            const result = await api.post("/auth/signup",{
                 firstName,lastName,email,password
             })
             // token saved to the local storage
 
-            setMessage({
-              type:"success",
-              text:"Welcome aboard, Gopher! Your account has been created successfully."
-            })
+            showToast("success", "Verification code sent to your email!")
             setLoading(false)
-            // navigate them to the events page
-            console.dir(result)
+            navigate("/verify-email", {state:{email}})
 
         } catch(error){
             setLoading(false)
-            const errorMessage =  error.response.data.message
+            const errorMessage = error.response?.data?.message ?? "Something went wrong"
 
-            setMessage({
-              type:"error",
-              text: errorMessage
-            })
-
-
+            showToast("error", errorMessage)
         }
 
     }
@@ -63,20 +52,18 @@ const SignUpComponenet = ({
             <div className="mx-auto h-14 w-14 bg-white rounded-xl flex items-center justify-center shadow-lg mb-3">
               <span className="text-[#7a0019] font-bold text-xl">M</span>
             </div>
-            <h2 className="text-xl font-bold text-white">University of Minnesota</h2>
+            <h2 className="font-sans text-xl font-bold text-white">University of Minnesota</h2>
             <p className="mt-1 text-[#ffcc33] text-xs font-semibold uppercase tracking-wider">Gopher Events</p>
           </div>
 
           {/* Form */}
           <div className="px-8 py-8">
-            {message && (
-              <div className="mb-5">
-                <GopherMessage
-                  type={message.type}
-                  message={message.text}
-                />
-              </div>
-            )}
+            <div className="mb-5">
+              <GopherMessage
+                type="info"
+                message="Only @umn.edu emails are allowed for now!"
+              />
+            </div>
             <form className="space-y-7" onSubmit={onSignupSubmit}>
               
               {/* First Name & Last Name — Side by Side */}

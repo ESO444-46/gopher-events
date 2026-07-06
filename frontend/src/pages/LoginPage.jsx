@@ -1,43 +1,29 @@
 import { useState } from "react"
-import axios from "axios";
-import { Navigate } from "react-router-dom";
-import GopherMessage from "../components/GopherMessage";
+import api from "../api/axios";
+import { useToast } from "../context/ToastContext";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [isLoading, setLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [message, setMessage] = useState(null)
-
+  const { showToast } = useToast()
+  const navigate = useNavigate()
 
 async function loginRequest(event){
     event.preventDefault();
     setLoading(true)
 
     try{
-        const result = await axios.post("http://localhost:3000/auth/login",{
+        const result = await api.post("/auth/login",{
           email,password
       })
 
       const {accessToken} = result.data
       localStorage.setItem("token",accessToken)
 
-      setMessage({
-        type:"success",
-        text:"Welcome back, Gopher!"
-      })
-
-      /*
-        Set a fuse for 1.5 seconds for the navigation to the events page
-        If not it's looks robotic or feels so fast that you dont even see the message
-        have that sense of missed feeling
-      */
-
-      setTimeout(()=>{
-        console.log("Naivgated to the /events page!")
-      },1500)
-
-
+      showToast("success", "Welcome back, Gopher!")
+      navigate('/events')
 
     }catch(error){
         /*
@@ -48,11 +34,6 @@ async function loginRequest(event){
       */
 
       setPassword("")
-      /*
-        In JavaScript, the || operator evaluates from left to right and 
-        stops the absolute second it finds something that is "truthy" 
-        (a string that isn't empty).
-      */
 
       let displayMessage = ""
       if(error.code == "ERR_NETWORK"){
@@ -64,7 +45,7 @@ async function loginRequest(event){
       else{
         displayMessage = "Something went wrong. Please try again.";
       }
-      setMessage({ type :'error', text: displayMessage});
+      showToast("error", displayMessage)
     }
 
     finally{
@@ -85,24 +66,13 @@ async function loginRequest(event){
             <div className="mx-auto h-14 w-14 bg-white rounded-xl flex items-center justify-center shadow-lg mb-3">
               <span className="text-[#7a0019] font-bold text-xl">M</span>
             </div>
-            <h2 className="text-xl font-bold text-white">University of Minnesota</h2>
+            <h2 className="font-sans text-xl font-bold text-white">University of Minnesota</h2>
             <p className="mt-1 text-[#ffcc33] text-xs font-semibold uppercase tracking-wider">Gopher Events</p>
           </div>
 
             {/* Form */}
             <div className="px-8 py-8">
 
-            {/*
-                We send the componenet the props!
-                Componenet title = {message.type}
-
-            */}
-            {message && (
-              <div className="mb-5">
-                <GopherMessage type={message.type} message={message.text}/>
-              </div>
-            )}
-            
             <form className="space-y-5" onSubmit={loginRequest}>
               
               {/* Email */}

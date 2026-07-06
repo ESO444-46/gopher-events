@@ -1,18 +1,24 @@
 import { useState } from "react";
 import TopNav from "../components/createEvent/TopNav";
-import Toast from "../components/ToastNotification";
 import Spinner from "../components/SpinnerComponent";
-import axios from "axios";
+import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../context/ToastContext";
 
 const CreateEvent = () => {
     const [title, setTitle] = useState('')
     const [description,setDescription] = useState("")
     const [venue, setVenue] = useState("")
+    const [thumbnailUrl, setThumbnailUrl] = useState("")
+    const [bannerUrl, setBannerUrl] = useState("")
     const [startsAt, setStartsAt] = useState("")
     const [endsAt, setEndsAt] = useState("")
+    {/* add these two state lines near your other useState calls */}
+    const [hasCapacity, setHasCapacity] = useState(false);
+    const [capacity, setCapacity] = useState("");
     const [isLoading, setLoading] = useState(false)
     const navigate = useNavigate()
+    const { showToast } = useToast()
 
 
     async function handleSubmission (e){
@@ -20,31 +26,28 @@ const CreateEvent = () => {
         setLoading(true)
 
 
-        localStorage.setItem("token","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIxLCJlbWFpbCI6InZhamluMDAxQHVtbi5lZHUiLCJpYXQiOjE3ODIzOTgzMDksImV4cCI6MTc4MjM5OTIwOX0.K_zcwOW1tB7pCMObVEJic_dm-9dD_Dd_q4hZFI10_NU")
-        const token = localStorage.getItem("token");
-        console.log(startsAt,endsAt)
         try {
-            const result = await axios.post(
-                `http://localhost:3000/events`,
+            const result = await api.post(
+                `/events`,
                 {
                     title,
                     description,
                     venue,
+                    thumbnailUrl,
+                    bannerUrl: bannerUrl || null,
+                    capacity: hasCapacity ? Number(capacity) : null,
                     startsAt: new Date(startsAt).toISOString(),
                     endsAt: new Date(endsAt).toISOString(),
-                },
-                {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
                 }
             );
             const {publicId} = result.data.event
+            showToast("success", "Event created!")
             navigate(`/events/${publicId}`)
-          
+
 
             }catch(error){
-              console.log(error.response)
+              const errorMessage = error.response?.data?.message ?? "Failed to create event"
+              showToast("error", errorMessage)
             }finally{
                 setLoading(false)
             }
@@ -54,14 +57,14 @@ const CreateEvent = () => {
     <div className="min-h-screen bg-gray-50">
       
       {/* Top Nav */}
-        <TopNav/>
+      <TopNav/>
 
       {/* Main Form */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
         
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Create Event</h1>
+          <h1 className="font-sans text-2xl font-bold text-gray-900">Create Event</h1>
           <p className="mt-1 text-gray-500 text-sm">Fill in the details for your campus event</p>
         </div>
 
@@ -103,6 +106,22 @@ const CreateEvent = () => {
               />
             </div>
 
+            {/* Banner Image URL */}
+            <div>
+              <label htmlFor="bannerUrl" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Banner Image URL (optional)
+              </label>
+              <input
+                id="bannerUrl"
+                name="bannerUrl"
+                value={bannerUrl}
+                onChange={(e) => setBannerUrl(e.target.value)}
+                type="url"
+                placeholder="Used for the event detail page header"
+                className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7a0019] focus:border-[#7a0019] transition-colors sm:text-sm"
+              />
+            </div>
+
             {/* Venue */}
             <div>
               <label htmlFor="venue" className="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -126,6 +145,69 @@ const CreateEvent = () => {
                   className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7a0019] focus:border-[#7a0019] transition-colors sm:text-sm"
                 />
               </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label htmlFor="capacityToggle" className="block text-sm font-semibold text-gray-700">
+                  Limit capacity
+                </label>
+                <button
+                  id="capacityToggle"
+                  type="button"
+                  role="switch"
+                  aria-checked={hasCapacity}
+                  onClick={() => {
+                    setHasCapacity(!hasCapacity);
+                    if (hasCapacity) setCapacity("");
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#7a0019] ${
+                    hasCapacity ? "bg-[#7a0019]" : "bg-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      hasCapacity ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {hasCapacity && (
+                <div className="mt-3">
+                  <label htmlFor="capacity" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Max capacity
+                  </label>
+                  <input
+                    id="capacity"
+                    name="capacity"
+                    type="number"
+                    min="1"
+                    value={capacity}
+                    onChange={(e) => setCapacity(e.target.value)}
+                    required={hasCapacity}
+                    placeholder="e.g., 50"
+                    className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7a0019] focus:border-[#7a0019] transition-colors sm:text-sm"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail Image URL */}
+            <div>
+              <label htmlFor="thumbnailUrl" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Thumbnail Image URL <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="thumbnailUrl"
+                name="thumbnailUrl"
+                value={thumbnailUrl}
+                onChange={(e) => setThumbnailUrl(e.target.value)}
+                type="url"
+                required
+                placeholder="Used for the event grid card image"
+                className="block w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7a0019] focus:border-[#7a0019] transition-colors sm:text-sm"
+              />
             </div>
 
             {/* Date & Time Row */}
@@ -187,7 +269,7 @@ const CreateEvent = () => {
 
           </form>
         </div>
-
+          
       </main>
     </div>
   );

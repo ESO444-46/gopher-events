@@ -1,9 +1,22 @@
-const EventHero = ({title}) => {
+import { useState } from "react";
+
+const EventHero = ({title, bannerUrl}) => {
+  const [bannerError, setBannerError] = useState(false);
+
   return (
     <div className="relative h-72 sm:h-96 overflow-hidden">
       {/* Background image with overlay */}
       <div className="absolute inset-0">
-        <div className="w-full h-full bg-gradient-to-br from-[#7a0019] via-[#a33c2d] to-[#ffcc33]" />
+        {bannerUrl && !bannerError ? (
+          <img
+            src={bannerUrl}
+            alt=""
+            onError={() => setBannerError(true)}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-maroon via-[#a33c2d] to-gold" />
+        )}
         <div className="absolute inset-0 bg-black/20" />
       </div>
       
@@ -31,7 +44,7 @@ const EventHero = ({title}) => {
             <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
             Upcoming
           </div>
-          <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight">
+          <h1 className="font-sans text-3xl sm:text-5xl font-bold text-white leading-tight">
             {title}
           </h1>
         </div>

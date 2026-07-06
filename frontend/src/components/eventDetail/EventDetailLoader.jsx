@@ -1,6 +1,6 @@
 const EventDetailLoader = () => {
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-cream flex flex-col items-center justify-center">
       
       {/* Spinning Goldy */}
       <div className="relative">

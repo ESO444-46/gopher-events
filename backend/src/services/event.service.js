@@ -7,6 +7,10 @@ async function createEvent(eventData) {
     return eventRepo.createEvent(eventData)
 };
 
+async function updateEvent(eventData) {
+    return eventRepo.updateEvent(eventData)
+};
+
 async function getEvents(searchString) {
     return eventRepo.getEvents(searchString)
 }
@@ -32,7 +36,7 @@ async function registerUserForEvent({ userId, publicId }) {
         throw err
     }
     try {
-        const result = userEventRepo.createRegistration(userId, event.id)
+        const result = await userEventRepo.createRegistration(userId, event.id)
         return { ...result, event }
 
     } catch (err) {
@@ -66,6 +70,7 @@ async function getEventAttendees(publicId, userId) {
 
 module.exports = {
     createEvent,
+    updateEvent,
     getEvents,
     getEventByPublicId,
     registerUserForEvent,

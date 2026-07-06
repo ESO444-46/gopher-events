@@ -20,6 +20,10 @@ const createEvent = z.object({
         .min(3, 'Venue should be more than 2 characters')
         .max(254, 'Venue should be less than 255 characters'),
 
+    thumbnailUrl: z.string().url(),
+
+    bannerUrl: z.string().url().optional().nullable(),
+
     startsAt: z.iso.datetime()
         .refine((val) => new Date(val).getTime() >= Date.now() - GRACE_MS,
             { message: 'Event start time must not be in the past' }),

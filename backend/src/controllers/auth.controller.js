@@ -1,9 +1,10 @@
 const authService = require('../services/auth.service')
-const { signupSchema, loginSchema } = require('../schemas/auth.schema');
+const { signupSchema, loginSchema, otpSchema } = require('../schemas/auth.schema');
 const SendEmail = require('../utils/email');
 
 async function signup(req, res) {
 
+    // Input Validation
     const result = signupSchema.safeParse(req.body);
 
     if (!result.success) {
@@ -13,23 +14,17 @@ async function signup(req, res) {
         })
     }
     const validatedData = result.data
-    console.log(validatedData)
 
     try {
+
+        // Saves user data into the Db records with flag ifVerified as false.
         const user = await authService.signup(validatedData);
 
-        const { error } = await SendEmail(
-            {
-                to: user.email,
-                subject: "Welcome to GopherEvents!",
-                text: "Hey! Welcome to GopherEvents. Start exploring events on your campus!"
-            });
-        if (error) console.log('Signup email failed', error)
+        await authService.sendVerificationOtp(user.email)
 
-        return res.status(201).json({
+        return res.json({
             success: true,
-            message: 'Signup successfull',
-            user,
+            message: 'Verification code sent to your email!',
         })
 
 
@@ -75,6 +70,13 @@ async function login(req, res) {
             })
         }
 
+        if (error.message === 'EMAIL_NOT_VERIFIED') {
+            return res.status(403).json({
+                success: false,
+                message: 'Please verify your email before logging in'
+            })
+        }
+
         return res.status(500).json({
             success: false,
             message: 'Internal server error'
@@ -84,7 +86,58 @@ async function login(req, res) {
 
 }
 
+
+async function verifyOtp(req, res) {
+
+    try {
+        const result = otpSchema.safeParse(req.body);
+        if (!result.success) {
+            return res.status(400).json({ success: false, message: result.error.issues[0].message });
+        }
+
+        // Calls service layer here
+        const { user, accessToken } = await authService.verifyUserOtp(result.data);
+
+        await SendEmail({
+            to: user.email,
+            subject: "Welcome to Gopher Events! 🎉",
+            html: `
+      <p>Hi there,</p>
+      <p>Your account has been successfully verified! Thank you for joining Gopher Events.</p>
+      <p>You can now log in, explore upcoming campus activities, and start viewing events right away.</p>
+      <p>Best,<br />The Gopher Events Team</p>
+    `
+        });
+
+        res.json({
+            success: true,
+            message: "OTP verified successfully",
+            user,
+            accessToken
+        });
+
+    } catch (error) {
+        // Catches the error thrown by the service layer
+        res.status(400).json({
+            success: false,
+            message: error.message // e.g., "Verification code has expired"
+        });
+    }
+
+
+}
+
+
+
+
 module.exports = {
     signup,
-    login
+    login,
+    verifyOtp
 }
+
+
+
+
+
+

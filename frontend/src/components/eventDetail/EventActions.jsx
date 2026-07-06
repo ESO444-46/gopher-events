@@ -1,42 +1,40 @@
 import { useState } from "react";
 import Spinner from "./Spinner";
-import axios from "axios";
+import api from "../../api/axios";
+import { useToast } from "../../context/ToastContext";
+import CapacityDisplay from "../../pages/CapacityDisplay";
 
 const EventActions = ({ eventId, publicId }) => {
   const [loading, setLoading] = useState(false);
   const [rsvp, setRsvp] = useState(false);
+  const { showToast } = useToast();
 
   async function handleRsvp() {
     setLoading(true);
-    localStorage.setItem("token","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIxLCJlbWFpbCI6InZhamluMDAxQHVtbi5lZHUiLCJpYXQiOjE3ODIzOTk0OTksImV4cCI6MTc4MjQwMDM5OX0.M3wH5Uz7wZPEKrxCLaHwfWAE6ayDQSZDX5hgkNXqWlY")
-    const token = localStorage.getItem("token");
     try {
-      const result = await axios.post(
-        `http://localhost:3000/events/${publicId}/rsvp`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const result = await api.post(
+        `/events/${publicId}/rsvp`,
+        {}
       );
       if (result.data.success) {
         setRsvp(true);
+        showToast("success", "RSVP confirmed!");
       }
     } catch (error) {
-      console.log("Error occurred", error);
+      const errorMessage = error.response?.data?.message ?? "Failed to RSVP";
+      showToast("error", errorMessage);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      <div className="h-1.5 bg-gradient-to-r from-[#7a0019] to-[#ffcc33]" />
+    <div className="rounded-2xl border border-line bg-paper shadow-sm overflow-hidden">
+      <div className="h-1.5 bg-gradient-to-r from-maroon to-gold" />
 
       <div className="p-6 space-y-5">
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-gray-900">Free</span>
+          <span className="text-2xl font-bold text-ink">Free</span>
           <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-100">
             Registration Required
           </span>
@@ -48,7 +46,7 @@ const EventActions = ({ eventId, publicId }) => {
           className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold text-white transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0
             ${rsvp
               ? "bg-green-600 hover:bg-green-700 focus:ring-green-600"
-              : "bg-[#7a0019] hover:bg-[#5a0012] hover:shadow-lg hover:-translate-y-0.5 focus:ring-[#7a0019]"
+              : "bg-maroon hover:bg-maroon-dark hover:shadow-lg hover:-translate-y-0.5 focus:ring-maroon"
             }`}
         >
           {loading ? (
@@ -72,6 +70,7 @@ const EventActions = ({ eventId, publicId }) => {
             </>
           )}
         </button>
+        <CapacityDisplay registered={10} capacity={40}/>
       </div>
     </div>
   );
