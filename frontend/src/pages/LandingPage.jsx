@@ -26,7 +26,7 @@ const LandingPage = () => {
         <nav>
           <a href="#top" className="logo">
             <span className="logo-pin" aria-hidden="true"></span>
-            GopherEvents
+            GopherEvent
           </a>
           <ul className="nav-links">
             <li><a href="#value">Why it exists</a></li>
@@ -48,7 +48,7 @@ const LandingPage = () => {
               <span className="eyebrow">University of Minnesota — Twin Cities</span>
               <h1>Every flyer on campus.<br />One board.</h1>
               <p className="sub">
-                GopherEvents pulls every club meeting, guest talk, and free-pizza night into one
+                GopherEvent pulls every club meeting, guest talk, and free-pizza night into one
                 place you'll actually check — no muted GroupMe required.
               </p>
               <div className="cta-row">
@@ -211,7 +211,7 @@ const LandingPage = () => {
             <div>
               <a href="#top" className="logo">
                 <span className="logo-pin" aria-hidden="true"></span>
-                GopherEvents
+                GopherEvent
               </a>
               <p className="foot-tag">
                 Built by a CS student who was tired of missing free pizza. One board for everything
@@ -226,7 +226,7 @@ const LandingPage = () => {
           </div>
           <div className="foot-bottom">
             <span>gopherevent.com</span>
-            <span>© 2026 GopherEvents · University of Minnesota, Twin Cities</span>
+            <span>© 2026 GopherEvent · University of Minnesota, Twin Cities</span>
           </div>
         </div>
       </footer>
