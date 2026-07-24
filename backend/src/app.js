@@ -8,7 +8,10 @@ const authRoutes = require('./routes/auth.routes')
 const eventRoutes = require('./routes/event.routes')
 
 const corsOptions = {
-	origin : "https://gopherevent.com",
+	origin: [
+		"https://gopherevent.com",
+		"http://localhost:5173"
+	],
 	credentials: true,
 };
 

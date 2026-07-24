@@ -194,6 +194,7 @@ const getEventByPublicId = async function (req, res) {
         })
 
     } catch (error) {
+        console.error(`Failed to fetch event ${result.data.publicId}:`, error)
         return res.status(500).json({
             success: false,
             message: "Internal server error"
